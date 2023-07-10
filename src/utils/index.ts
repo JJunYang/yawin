@@ -27,3 +27,18 @@ export const getAbsolutePath = (fromPath: string, currentWorkSpace = process.cwd
   const targetPath = path.isAbsolute(fromPath) ? fromPath : path.join(currentWorkSpace, fromPath);
   return targetPath;
 };
+
+/**
+ * 删除目标文件或者清空文件夹
+ * @param fileList 待删除的文件和文件夹信息，path：文件地址；isDir：是否为文件夹
+ */
+export const removeFiles = (fileList: { path: string; isDir: boolean }[]) => {
+  fileList.forEach((item) => {
+    if (item.isDir) {
+      fs.emptyDirSync(item.path);
+      fs.rmdirSync(item.path);
+    } else {
+      fs.rmSync(item.path);
+    }
+  });
+};

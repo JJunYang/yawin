@@ -5,7 +5,7 @@ import { Command } from 'commander';
 import compressing from 'compressing';
 import fse from 'fs-extra';
 import path from 'path';
-import { downLoadZip, getAbsolutePath } from '../../utils';
+import { downLoadZip, getAbsolutePath, removeFiles } from '../../utils';
 import { DEFAULT_BRANCH, REPOSITORY_NAME } from './const';
 
 const initCommand = new Command('init')
@@ -29,45 +29,49 @@ initCommand.action(async (options) => {
         { value: 'npm', name: 'NPM 包', description: '新建npm包仓库' },
         { value: 'page', name: '单页应用', description: '新建单页应用' },
         new Separator(),
-        { value: 'react-app-template', name: 'react-ts-app', description: '新建React+ts的app项目' },
+        {
+          value: 'react-app-template',
+          name: 'react-ts-app',
+          description: '新建基于React+Typescript的app应用项目',
+        },
+        {
+          value: 'npm-ts-template',
+          name: 'npm-ts-template',
+          description: '新建基于Typescript的npm包项目',
+        },
       ],
     });
     const branchName = DEFAULT_BRANCH;
-    switch (initType) {
-      case 'npm':
-        console.log('开始初始化npm项目');
-        break;
-      case 'page':
-        console.log('单页应用');
-        break;
-      case 'react-app-template': {
-        console.log('开始初始化test项目');
-        const zipPath: string = await downLoadZip(workspace, branchName);
-        // 解压文件地址
-        const fileToDecompress = getAbsolutePath(zipPath);
-        // 解压地址
-        const pathToDecompress = path.dirname(fileToDecompress);
-        await compressing.tgz.uncompress(fileToDecompress, pathToDecompress);
 
-        const decompressedTopDir = path.join(pathToDecompress, REPOSITORY_NAME + '-' + branchName);
-        // 获取到解压文件内的对应项目地址
-        const projectDir = path.join(decompressedTopDir, initType);
-        const subFiles = fse.readdirSync(projectDir);
-        for (const subFile of subFiles) {
-          const sourcePath = path.join(projectDir, subFile);
-          const targetPath = path.join(workspace, subFile);
-          fse.moveSync(sourcePath, targetPath);
-        }
+    console.log(`开始初始化${initType}项目`);
+    const zipPath: string = await downLoadZip(workspace, branchName);
+    // 待解压文件地址
+    const fileToDecompress = getAbsolutePath(zipPath);
+    // 解压目标地址
+    const pathToDecompress = path.dirname(fileToDecompress);
+    await compressing.tgz.uncompress(fileToDecompress, pathToDecompress);
 
-        fse.rmSync(fileToDecompress);
-        fse.emptyDirSync(path.join(decompressedTopDir));
-        fse.rmdirSync(path.join(decompressedTopDir));
-        break;
-      }
-      default:
-        break;
+    // 解压后的文件地址
+    const decompressedTopDir = path.join(pathToDecompress, REPOSITORY_NAME + '-' + branchName);
+    const needRemoveList = [
+      { path: fileToDecompress, isDir: false },
+      { path: decompressedTopDir, isDir: true },
+    ];
+    // 获取到解压文件内的对应项目地址
+    const projectDir = path.join(decompressedTopDir, initType);
+    if (!fse.existsSync(projectDir)) {
+      removeFiles(needRemoveList);
+      console.log(colors.red('[ERROR]') + `${initType}项目不存在，初始化失败`);
+      process.exit(1);
+    }
+    const subFiles = fse.readdirSync(projectDir);
+    for (const subFile of subFiles) {
+      const sourcePath = path.join(projectDir, subFile);
+      const targetPath = path.join(workspace, subFile);
+      fse.moveSync(sourcePath, targetPath);
     }
 
+    removeFiles(needRemoveList);
     console.log(colors.green('[SUCCESS]') + `初始化${initType}项目成功`);
     process.exit(0);
   } catch (error) {
