@@ -1,12 +1,13 @@
-import colors from 'colors';
 import { cosmiconfigSync } from 'cosmiconfig';
 import fse from 'fs-extra';
 import path from 'path';
-import { ProjectType } from '../types/project';
+import { ConfigType } from '../types/project';
 
 export class Project {
   private _packageJsonDir: string;
-  private _config: { type: ProjectType };
+  private _config: ConfigType | undefined;
+
+  public isEmptyProject = false;
 
   constructor(private workspace: string) {
     this._packageJsonDir = path.join(this.workspace, 'package.json');
@@ -16,13 +17,22 @@ export class Project {
     }).search(this.workspace);
 
     if (fse.existsSync(this._packageJsonDir)) {
-      console.log(colors.grey('[INFO]') + 'init config', explorerResult);
-      this._config = explorerResult?.config || {};
+      if (typeof explorerResult?.config === 'function') {
+        this._config = explorerResult?.config() || {};
+      } else {
+        this._config = explorerResult?.config || {};
+      }
     } else {
-      console.log(
-        colors.red('[ERROR]') + '当前目录不存在package.json文件: ' + colors.bgBlue(`${workspace}`),
-      );
+      this.isEmptyProject = true;
     }
+  }
+
+  getAllConfig() {
+    return this._config || {};
+  }
+
+  getConfigItem(key: keyof ConfigType) {
+    return this._config?.[key];
   }
 }
 
