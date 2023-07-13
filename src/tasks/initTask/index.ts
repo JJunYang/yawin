@@ -1,12 +1,11 @@
-import { Separator } from '@inquirer/prompts';
-import select from '@inquirer/select';
 import colors from 'colors';
 import { Command } from 'commander';
 import compressing from 'compressing';
 import fse from 'fs-extra';
+import inquirer from 'inquirer';
 import path from 'path';
 import { downLoadZip, getAbsolutePath, removeFiles } from '../../utils';
-import { DEFAULT_BRANCH, REPOSITORY_NAME } from './const';
+import { DEFAULT_BRANCH, REPOSITORY_NAME, initTypeOptions, npmOptions } from './const';
 
 const initCommand = new Command('init')
   .description('yawin first init command')
@@ -23,27 +22,13 @@ initCommand.action(async (options) => {
       process.exit(-1);
     }
     console.log(colors.green('[INFO] 检测当前目录为空'));
-    const initType = await select({
-      message: 'Select Init Template',
-      choices: [
-        { value: 'npm', name: 'NPM 包', description: '新建npm包仓库' },
-        { value: 'page', name: '单页应用', description: '新建单页应用' },
-        new Separator(),
-        {
-          value: 'react-app-template',
-          name: 'react-ts-app',
-          description: '新建基于React+Typescript的app应用项目',
-        },
-        {
-          value: 'npm-ts-template',
-          name: 'npm-ts-template',
-          description: '新建基于Typescript的npm包项目',
-        },
-      ],
-    });
+    const { initType } = await inquirer.prompt(initTypeOptions);
+
     const branchName = DEFAULT_BRANCH;
 
     console.log(`开始初始化${initType}项目`);
+    const answer = await inquirer.prompt(npmOptions);
+
     const zipPath: string = await downLoadZip(workspace, branchName);
     // 待解压文件地址
     const fileToDecompress = getAbsolutePath(zipPath);
@@ -72,6 +57,16 @@ initCommand.action(async (options) => {
     }
 
     removeFiles(needRemoveList);
+
+    // 额外配置更新至package.json
+    const pkgDir = path.join(workspace, 'package.json');
+    const pkgData = fse.readFileSync(pkgDir, 'utf-8');
+    const jsonData = JSON.parse(pkgData);
+    for (const key in answer) {
+      jsonData[key] = answer[key];
+    }
+    fse.writeFileSync(pkgDir, JSON.stringify(jsonData, null, '\t'), 'utf-8');
+
     console.log(colors.green('[SUCCESS]') + `初始化${initType}项目成功`);
     process.exit(0);
   } catch (error) {
