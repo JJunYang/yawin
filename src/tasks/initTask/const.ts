@@ -16,9 +16,8 @@ export const initTypeOptions: QuestionCollection = [
     name: 'initType',
     message: 'Select Init Template',
     choices: [
-      { value: 'npm', name: 'NPM 包', description: '新建npm包仓库' },
-      { value: 'page', name: '单页应用', description: '新建单页应用' },
-      new Separator(),
+      // { value: 'npm', name: 'NPM 包', description: '新建npm包仓库' },
+      // { value: 'page', name: '单页应用', description: '新建单页应用' },
       {
         value: 'react-app-template',
         name: 'react-ts-app',
@@ -29,6 +28,7 @@ export const initTypeOptions: QuestionCollection = [
         name: 'npm-ts-template',
         description: '新建基于Typescript的npm包项目',
       },
+      new Separator(),
     ],
   },
 ];
