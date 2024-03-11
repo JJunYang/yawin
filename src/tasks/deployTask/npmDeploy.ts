@@ -1,4 +1,5 @@
 import path from 'path';
+import { getFileDirBubble } from '../../libs/getFileDirBubble';
 
 export class NpmDeploy {
   private workspace: string;
@@ -14,7 +15,9 @@ export class NpmDeploy {
     }
   }
 
-  private genNpmRc = () => {
+  private genNpmRc = async () => {
     const npmrcDir = path.join(this.workspace, '.npmrc');
+    const gitDir = await getFileDirBubble('.git', this.workspace, 'directory');
+    console.log('🚀 ~ gitDir:', gitDir);
   };
 }
