@@ -1,8 +1,9 @@
 {
-  "name": "yawin",
-  "version": "1.0.0",
+  "name": "@jjunyang/yawin",
+  "version": "0.0.1",
   "description": "",
   "keywords": [],
+  "repository": "github.com/jjunyang/yawin",
   "license": "ISC",
   "author": "",
   "main": "index.js",
@@ -11,6 +12,7 @@
   },
   "scripts": {
     "build": "npx tsc",
+    "deploy": "npm publish",
     "dev": "npx tsc --watch"
   },
   "dependencies": {
