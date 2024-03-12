@@ -1,5 +1,5 @@
-import colors from 'colors';
 import { Command } from 'commander';
+import { logAndExit } from '../../utils/log';
 import { currentProject } from '../../utils/project';
 import { NpmDeploy } from './npmDeploy';
 
@@ -14,7 +14,7 @@ deployCommand.action((options) => {
     } else if (type === 'app') {
       //
     } else {
-      console.log(colors.red('[ERROR]') + `当前运行目录不为根目录，或当前项目不为npm项目`);
+      logAndExit('当前运行目录不为根目录，或当前项目不为npm项目', 1);
     }
   } catch (error) {
     //
