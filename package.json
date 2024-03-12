@@ -1,6 +1,6 @@
 {
   "name": "@jjunyang/yawin",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "keywords": [],
   "repository": "github.com/jjunyang/yawin",
@@ -16,11 +16,12 @@
     "dev": "npx tsc --watch"
   },
   "dependencies": {
-    "axios": "^1.4.0",
+    "axios": "^1.6.7",
     "colors": "^1.4.0",
     "commander": "^11.0.0",
     "compressing": "^1.9.0",
     "cosmiconfig": "^8.2.0",
+    "cross-spawn": "^7.0.3",
     "fs-extra": "^11.1.1",
     "inquirer": "^8.0.0"
   },
