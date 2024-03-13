@@ -1,12 +1,13 @@
 import axios, { AxiosInstance } from 'axios';
-const authToken = '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';
+import dotEnv from 'dotenv';
+dotEnv.config();
 
 export const axiosInstance: AxiosInstance = axios.create({
   baseURL: '/',
   method: 'GET',
   headers: {
     Accept: 'application/vnd.github+json',
-    Authorization: `Bearer ${authToken}`,
+    Authorization: `Bearer ${process.env.TOKEN}`,
     'X-GitHub-Api-Version': '2022-11-28',
   },
 });
@@ -28,6 +29,7 @@ export const getPkgAllVersion = async () => {
       url: 'https://api.github.com/users/jjunyang/packages/npm/yawin/versions',
     });
     const versions = data.map((item: any) => item.name);
+    console.log('🚀 ~ versions:', versions);
 
     return versions;
   } catch (error) {

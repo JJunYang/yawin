@@ -38,9 +38,13 @@ export class NpmDeploy {
     logger.info('开始写入 .npmrc 文件...');
     fse.writeFileSync(
       npmrcDir,
-      '//npm.pkg.github.com/:_authToken=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\n' +
+      `//npm.pkg.github.com/:_authToken=${process.env.TOKEN}\n` +
         `@jjunyang:registry=https://npm.pkg.github.com`,
     );
     logger.success('写入完成！');
+  };
+
+  private rmNpmRc = () => {
+    fse.removeSync(path.join(this.workspace, '.npmrc'));
   };
 }

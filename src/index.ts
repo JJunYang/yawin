@@ -1,8 +1,10 @@
 import { Command } from 'commander';
+import dotEnv from 'dotenv';
 import { deployCommand } from './tasks/deployTask';
 import { devCommand } from './tasks/devTask';
 import { initCommand } from './tasks/initTask';
 import { testCommand } from './tasks/testTask';
+dotEnv.config();
 
 const program = new Command();
 
