@@ -29,7 +29,6 @@ export const getPkgAllVersion = async () => {
       url: 'https://api.github.com/users/jjunyang/packages/npm/yawin/versions',
     });
     const versions = data.map((item: any) => item.name);
-    console.log('🚀 ~ versions:', versions);
 
     return versions;
   } catch (error) {

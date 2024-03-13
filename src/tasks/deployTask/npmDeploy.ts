@@ -1,3 +1,4 @@
+import { spawnSync } from 'child_process';
 import fse from 'fs-extra';
 import path from 'path';
 import { getFileDirBubble } from '../../libs/getFileDirBubble';
@@ -18,9 +19,16 @@ export class NpmDeploy {
       logger.info(`开始 ${pkgData.name} 的发布过程`);
       const gitUtil = new GitUtil(process.cwd());
       const isPublish = await gitUtil.checkVersionExist(pkgData.version);
-      console.log('🚀 ~ isPublish:', isPublish);
+      if (isPublish) {
+        logger.warn(`${pkgData.name} 包的 v${pkgData.version} 版本已经存在，已跳过发布`);
+      } else {
+        const gitUrl = this.doPublishAction(pkgData);
+        logger.success(`包 ${pkgData.name} 发布成功，地址为：${gitUrl}`);
+      }
     } catch (error: any) {
       logAndExit(error, 1);
+    } finally {
+      this.rmNpmRc();
     }
   }
 
@@ -46,5 +54,11 @@ export class NpmDeploy {
 
   private rmNpmRc = () => {
     fse.removeSync(path.join(this.workspace, '.npmrc'));
+  };
+
+  doPublishAction = (pkgData: any) => {
+    logger.info(`开始执行${pkgData.name}的 npm 发布命令`);
+    const res = spawnSync('npm publish', { shell: true, cwd: this.workspace });
+    return res.stdout.toString();
   };
 }
