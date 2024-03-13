@@ -11,7 +11,6 @@ const testCommand = new Command('test')
   .action(async (options) => {
     try {
       const workspace = options.file ? getAbsolutePath(options.file) : process.cwd();
-      console.log('🚀 ~ workspace:', workspace);
       const answer = await inquirer.prompt([
         {
           name: 'name',

@@ -5,6 +5,7 @@ import fse from 'fs-extra';
 import inquirer from 'inquirer';
 import path from 'path';
 import { downLoadZip, getAbsolutePath, removeFiles } from '../../utils';
+import logger, { logAndExit } from '../../utils/log';
 import { DEFAULT_BRANCH, REPOSITORY_NAME, initTypeOptions, npmOptions } from './const';
 
 const initCommand = new Command('init')
@@ -18,15 +19,14 @@ initCommand.action(async (options) => {
 
     const targetDir = fse.readdirSync(workspace);
     if (targetDir && targetDir.length > 0) {
-      console.log(colors.red('[ERROR]') + '目标目录不为空: ' + colors.bgBlue(`${workspace}`));
-      process.exit(-1);
+      logAndExit('目标目录不为空: ' + colors.bgBlue(`${workspace}`), 1);
     }
-    console.log(colors.green('[INFO] 检测当前目录为空'));
+    logger.success('检测当前目录为空');
     const { initType } = await inquirer.prompt(initTypeOptions);
 
     const branchName = DEFAULT_BRANCH;
 
-    console.log(`开始初始化${initType}项目`);
+    logger.info(`开始初始化${initType}项目`);
     const answer = await inquirer.prompt(npmOptions);
 
     const zipPath: string = await downLoadZip(workspace, branchName);
@@ -46,8 +46,7 @@ initCommand.action(async (options) => {
     const projectDir = path.join(decompressedTopDir, initType);
     if (!fse.existsSync(projectDir)) {
       removeFiles(needRemoveList);
-      console.log(colors.red('[ERROR]') + `${initType}项目不存在，初始化失败`);
-      process.exit(1);
+      logAndExit(`${initType}项目不存在，初始化失败`, 1);
     }
     const subFiles = fse.readdirSync(projectDir);
     for (const subFile of subFiles) {
@@ -66,12 +65,9 @@ initCommand.action(async (options) => {
       jsonData[key] = answer[key];
     }
     fse.writeFileSync(pkgDir, JSON.stringify(jsonData, null, '\t'), 'utf-8');
-
-    console.log(colors.green('[SUCCESS]') + `初始化${initType}项目成功`);
-    process.exit(0);
-  } catch (error) {
-    console.log(colors.red('[ERROR]') + error);
-    process.exit(-1);
+    logAndExit(`初始化${initType}项目成功`, 0);
+  } catch (error: any) {
+    logAndExit(error, 1);
   }
 });
 
