@@ -1,7 +1,6 @@
 import { spawnSync } from 'child_process';
 import fse from 'fs-extra';
 import path from 'path';
-import { getPkgAllVersion } from '../../libs/api';
 import { getFileDirBubble } from '../../libs/getFileDirBubble';
 import logger, { logAndExit } from '../../utils/log';
 import { getPackageJsonData } from '../../utils/pkgData';
@@ -14,10 +13,17 @@ export class NpmDeploy {
 
   public async run() {
     try {
-      await this.genNpmRc();
       const pkgData = getPackageJsonData(path.join(process.cwd(), 'package.json'));
+      let pkgName = '';
+      if (pkgData.name.startsWith('@jjunyang')) {
+        pkgName = pkgData.name.split('/')[1];
+      }
+      if (!pkgName) {
+        logAndExit('项目名不符合 @jjunyang/PROJECT_NAME 的格式，请重新设置！');
+      }
+      await this.genNpmRc();
       logger.info(`开始 ${pkgData.name} 的发布过程`);
-      const isPublish = await this.checkVersionExist(pkgData.version);
+      const isPublish = await this.checkVersionExist(pkgData);
       if (isPublish) {
         logger.warn(`${pkgData.name} 包的 v${pkgData.version} 版本已经存在，已跳过发布`);
       } else {
@@ -73,9 +79,20 @@ export class NpmDeploy {
     return res.stdout.toString();
   };
 
-  public checkVersionExist = async (target: string) => {
-    const versions = await getPkgAllVersion();
+  /**
+   * 检查包版本是否存在
+   * @param target 项目package json 信息
+   * @returns
+   */
+  public checkVersionExist = async (target: any) => {
+    const res = spawnSync(`npm view ${target.name} --json`, {
+      shell: true,
+      cwd: this.workspace,
+    });
+    const resString = res.stdout.toString();
+    if (!resString) return false;
+    const pkgJson = JSON.parse(resString);
 
-    return versions.includes(target);
+    return pkgJson.versions.includes(target.version);
   };
 }

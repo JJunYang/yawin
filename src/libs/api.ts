@@ -12,10 +12,10 @@ export const axiosInstance: AxiosInstance = axios.create({
   },
 });
 
-export const getAllPkg = async () => {
+export const getAllPkg = async (type = 'npm') => {
   try {
     const res = await axiosInstance.request({
-      url: 'https://api.github.com/user/packages?package_type=npm',
+      url: `https://api.github.com/user/packages?package_type=${type}`,
     });
     return res.data;
   } catch (error) {
@@ -27,10 +27,10 @@ export const getAllPkg = async () => {
  * 获取 npm 包的所有版本
  * @returns
  */
-export const getPkgAllVersion = async () => {
+export const getPkgAllVersion = async (type = 'npm', name = 'yawin') => {
   try {
     const { data } = await axiosInstance.request({
-      url: 'https://api.github.com/users/jjunyang/packages/npm/yawin/versions',
+      url: `https://api.github.com/user/packages/${type}/${name}/versions`,
     });
     const versions = data.map((item: any) => item.name);
 
