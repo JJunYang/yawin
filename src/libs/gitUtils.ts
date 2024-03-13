@@ -1,6 +1,5 @@
 import { spawnSync } from 'child_process';
 import path from 'path';
-import { getPkgAllVersion } from './api';
 
 export class GitUtil {
   private gitUrl?: string;
@@ -24,11 +23,5 @@ export class GitUtil {
       cwd: this.localWorkSpace,
     });
     this.gitUrl = res.stdout.toString();
-  }
-
-  public async checkVersionExist(target: string) {
-    const versions = await getPkgAllVersion();
-
-    return versions.includes(target);
   }
 }

@@ -23,6 +23,10 @@ export const getAllPkg = async () => {
   }
 };
 
+/**
+ * 获取 npm 包的所有版本
+ * @returns
+ */
 export const getPkgAllVersion = async () => {
   try {
     const { data } = await axiosInstance.request({

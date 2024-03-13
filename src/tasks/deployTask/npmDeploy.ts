@@ -1,8 +1,8 @@
 import { spawnSync } from 'child_process';
 import fse from 'fs-extra';
 import path from 'path';
+import { getPkgAllVersion } from '../../libs/api';
 import { getFileDirBubble } from '../../libs/getFileDirBubble';
-import { GitUtil } from '../../libs/gitUtils';
 import logger, { logAndExit } from '../../utils/log';
 import { getPackageJsonData } from '../../utils/pkgData';
 
@@ -17,8 +17,7 @@ export class NpmDeploy {
       await this.genNpmRc();
       const pkgData = getPackageJsonData(path.join(process.cwd(), 'package.json'));
       logger.info(`开始 ${pkgData.name} 的发布过程`);
-      const gitUtil = new GitUtil(process.cwd());
-      const isPublish = await gitUtil.checkVersionExist(pkgData.version);
+      const isPublish = await this.checkVersionExist(pkgData.version);
       if (isPublish) {
         logger.warn(`${pkgData.name} 包的 v${pkgData.version} 版本已经存在，已跳过发布`);
       } else {
@@ -32,6 +31,10 @@ export class NpmDeploy {
     }
   }
 
+  /**
+   * 生成 .npmrc 文件信息为发布需要的信息，包括 token，registry 等
+   * @returns
+   */
   private genNpmRc = async () => {
     const npmrcDir = path.join(this.workspace, '.npmrc');
     const gitDir = await getFileDirBubble('.git', this.workspace, 'directory');
@@ -52,13 +55,27 @@ export class NpmDeploy {
     logger.success('写入完成！');
   };
 
+  /**
+   * 删除生成的 .npmrc 文件
+   */
   private rmNpmRc = () => {
     fse.removeSync(path.join(this.workspace, '.npmrc'));
   };
 
-  doPublishAction = (pkgData: any) => {
+  /**
+   * 执行发布命令，返回发布结果信息
+   * @param pkgData 项目信息
+   * @returns
+   */
+  private doPublishAction = (pkgData: any) => {
     logger.info(`开始执行${pkgData.name}的 npm 发布命令`);
     const res = spawnSync('npm publish', { shell: true, cwd: this.workspace });
     return res.stdout.toString();
+  };
+
+  public checkVersionExist = async (target: string) => {
+    const versions = await getPkgAllVersion();
+
+    return versions.includes(target);
   };
 }
