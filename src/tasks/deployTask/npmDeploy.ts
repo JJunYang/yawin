@@ -28,7 +28,7 @@ export class NpmDeploy {
         logger.warn(`${pkgData.name} 包的 v${pkgData.version} 版本已经存在，已跳过发布`);
       } else {
         const gitUrl = this.doPublishAction(pkgData);
-        logger.success(`包 ${pkgData.name} 发布成功，地址为：${gitUrl}`);
+        logger.success(`包 ${pkgData.name} 发布成功，结果为：${gitUrl}`);
       }
     } catch (error: any) {
       logAndExit(error, 1);
