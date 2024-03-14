@@ -56,7 +56,7 @@ export class NpmDeploy {
     fse.writeFileSync(
       npmrcDir,
       `//npm.pkg.github.com/:_authToken=${process.env.TOKEN}\n` +
-        `@jjunyang:registry=https://npm.pkg.github.com`,
+        `@${process.env.SCOPE_NAME}:registry=https://npm.pkg.github.com`,
     );
     logger.success('写入完成！');
   };
