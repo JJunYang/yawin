@@ -1,9 +1,9 @@
 {
   "name": "@jjunyang/yawin",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "",
   "keywords": [],
-  "repository": "github.com/jjunyang/yawin",
+  "repository": "https://github.com/jjunyang/yawin.git",
   "license": "ISC",
   "author": "",
   "main": "index.js",
