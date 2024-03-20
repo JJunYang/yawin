@@ -39,6 +39,19 @@ SCOPE_NAME=<YOUR_SCOPE_NAME>
 
 Run `yawin deploy` to publish your package to your Github Package.
 
+### Install package from Github Packages
+
+First you can add configuration to **.npmrc** file in root of project, or you can choose to add into global scope **.npmrc** file:
+
+```
+//npm.pkg.github.com/:_authToken=<YOUR_TOKEN>
+<SCOPE_NAME>:registry=https://npm.pkg.github.com
+```
+
+> Tips: run `npm config ls` to see config file location
+
+Then run `npm install <YOUR_PACKAGE>` to install.
+
 ## Initialize Project
 
 After `npm run dev` in yawin project, run `yawin init` to select configuration to quickly initialize project.
